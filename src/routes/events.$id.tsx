@@ -26,9 +26,9 @@ const NIGHTS = Array.from({ length: 9 }, (_, i) => `${i + 3} Oct 2026`);
 function EventPage() {
   const e = Route.useLoaderData();
   const nav = useNavigate();
-  const [passId, setPassId] = useState(e.passes[0].id);
+  const [passId, setPassId] = useState(e.passes[0]!.id);
   const [qty, setQty] = useState(1);
-  const [date, setDate] = useState(NIGHTS[0]);
+  const [date, setDate] = useState<string>(NIGHTS[0]!);
   const [f, setF] = useState({ name: "", phone: "", email: "" });
   const [paying, setPaying] = useState(false);
   const pass = e.passes.find((p) => p.id === passId)!;
