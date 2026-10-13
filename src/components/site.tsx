@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { useQuery } from "@tanstack/react-query";
+import { settingsQuery } from "@/lib/data";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -26,7 +28,6 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link to="/my-pass" className="hidden text-sm font-medium sm:block">Login</Link>
           <Link to="/events" className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">Explore Events</Link>
         </div>
       </div>
@@ -35,18 +36,19 @@ export function Header() {
 }
 
 export function Footer() {
+  const { data: s } = useQuery(settingsQuery);
   return (
     <footer className="mt-24 bg-forest text-forest-foreground">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 md:grid-cols-3">
         <div>
           <p className="font-display text-2xl">AapnoPass</p>
-          <p className="mt-2 text-sm opacity-70">Surat Ni Navratri, Aapno Pass.</p>
+          <p className="mt-2 text-sm opacity-70">{s?.tagline}</p>
         </div>
         <div className="text-sm opacity-80">
-          <p className="font-semibold">Find. Book. Celebrate.</p>
-          <p className="mt-2">Secure payments · Instant PDF passes · QR entry</p>
+          <p className="font-semibold">{s?.supportLine}</p>
+          <p className="mt-2">{s?.contactPhone} · {s?.contactEmail}</p>
         </div>
-        <div className="text-sm opacity-70 md:text-right">© 2026 AapnoPass, Surat</div>
+        <div className="text-sm opacity-70 md:text-right">{s?.footerText}</div>
       </div>
     </footer>
   );

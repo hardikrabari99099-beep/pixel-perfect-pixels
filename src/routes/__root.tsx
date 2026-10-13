@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header, Footer } from "@/components/site";
+import { settingsQuery } from "@/lib/data";
 
 function NotFoundComponent() {
   return (
@@ -59,6 +60,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(settingsQuery).catch(() => null),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
