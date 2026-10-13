@@ -10,33 +10,114 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as MyPassRouteImport } from './routes/my-pass'
+import { Route as EventsIdRouteImport } from './routes/events.$id'
+import { Route as SuccessBookingIdRouteImport } from './routes/success.$bookingId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyPassRoute = MyPassRouteImport.update({
+  id: '/my-pass',
+  path: '/my-pass',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIdRoute = EventsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => EventsRoute,
+} as any)
+const SuccessBookingIdRoute = SuccessBookingIdRouteImport.update({
+  id: '/success/$bookingId',
+  path: '/success/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRouteWithChildren
+  '/how-it-works': typeof HowItWorksRoute
+  '/my-pass': typeof MyPassRoute
+  '/events/$id': typeof EventsIdRoute
+  '/success/$bookingId': typeof SuccessBookingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRouteWithChildren
+  '/how-it-works': typeof HowItWorksRoute
+  '/my-pass': typeof MyPassRoute
+  '/events/$id': typeof EventsIdRoute
+  '/success/$bookingId': typeof SuccessBookingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRouteWithChildren
+  '/how-it-works': typeof HowItWorksRoute
+  '/my-pass': typeof MyPassRoute
+  '/events/$id': typeof EventsIdRoute
+  '/success/$bookingId': typeof SuccessBookingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/events'
+    | '/how-it-works'
+    | '/my-pass'
+    | '/events/$id'
+    | '/success/$bookingId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/contact'
+    | '/events'
+    | '/how-it-works'
+    | '/my-pass'
+    | '/events/$id'
+    | '/success/$bookingId'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/events'
+    | '/how-it-works'
+    | '/my-pass'
+    | '/events/$id'
+    | '/success/$bookingId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
+  EventsRoute: typeof EventsRouteWithChildren
+  HowItWorksRoute: typeof HowItWorksRoute
+  MyPassRoute: typeof MyPassRoute
+  SuccessBookingIdRoute: typeof SuccessBookingIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +129,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-pass': {
+      id: '/my-pass'
+      path: '/my-pass'
+      fullPath: '/my-pass'
+      preLoaderRoute: typeof MyPassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$id': {
+      id: '/events/$id'
+      path: '/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof EventsIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/success/$bookingId': {
+      id: '/success/$bookingId'
+      path: '/success/$bookingId'
+      fullPath: '/success/$bookingId'
+      preLoaderRoute: typeof SuccessBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface EventsRouteChildren {
+  EventsIdRoute: typeof EventsIdRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsIdRoute: EventsIdRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
+  EventsRoute: EventsRouteWithChildren,
+  HowItWorksRoute: HowItWorksRoute,
+  MyPassRoute: MyPassRoute,
+  SuccessBookingIdRoute: SuccessBookingIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
