@@ -14,16 +14,184 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string
+          event_name: string
+          id: string
+          name: string
+          night: string
+          pass_id: string
+          pass_name: string
+          phone: string
+          qty: number
+          status: string
+          total: number
+          utr: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id: string
+          event_name: string
+          id: string
+          name: string
+          night: string
+          pass_id: string
+          pass_name: string
+          phone: string
+          qty: number
+          status?: string
+          total: number
+          utr: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string
+          event_name?: string
+          id?: string
+          name?: string
+          night?: string
+          pass_id?: string
+          pass_name?: string
+          phone?: string
+          qty?: number
+          status?: string
+          total?: number
+          utr?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          about: string
+          active: boolean
+          area: string
+          artist: string
+          created_at: string
+          dates: string
+          id: string
+          name: string
+          nights: string[]
+          passes: Json
+          sort: number
+          tag: string
+          time: string
+          venue: string
+        }
+        Insert: {
+          about?: string
+          active?: boolean
+          area?: string
+          artist?: string
+          created_at?: string
+          dates?: string
+          id: string
+          name: string
+          nights?: string[]
+          passes?: Json
+          sort?: number
+          tag?: string
+          time?: string
+          venue?: string
+        }
+        Update: {
+          about?: string
+          active?: boolean
+          area?: string
+          artist?: string
+          created_at?: string
+          dates?: string
+          id?: string
+          name?: string
+          nights?: string[]
+          passes?: Json
+          sort?: number
+          tag?: string
+          time?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          data: Json
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_bookings: {
+        Args: { _ids: string[] }
+        Returns: {
+          created_at: string
+          email: string
+          event_id: string
+          event_name: string
+          id: string
+          name: string
+          night: string
+          pass_id: string
+          pass_name: string
+          phone: string
+          qty: number
+          status: string
+          total: number
+          utr: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +318,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
