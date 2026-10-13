@@ -1,33 +1,53 @@
-export type PassType = { id: string; name: string; price: number; desc: string; left: number; vip?: boolean };
+import { queryOptions } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export type PassType = { id: string; name: string; price: number; desc: string; left: number; season?: boolean; vip?: boolean };
 export type EventItem = {
   id: string; name: string; venue: string; area: string; dates: string; time: string;
-  artist: string; tag: string; from: number; about: string; passes: PassType[];
+  artist: string; tag: string; about: string; nights: string[]; passes: PassType[]; active: boolean; sort: number;
 };
-
-const std = (base: number): PassType[] => [
-  { id: "single", name: "Single Day", price: base, desc: "Entry for any one night", left: 240 },
-  { id: "couple", name: "Couple Pass", price: Math.round(base * 1.8), desc: "Entry for two, one night", left: 120 },
-  { id: "season", name: "Season Pass", price: base * 7, desc: "All 9 nights, one person", left: 60 },
-  { id: "vip", name: "VIP Season", price: base * 14, desc: "All nights, lounge & front circle", left: 15, vip: true },
-];
-
-export const EVENTS: EventItem[] = [
-  { id: "rangilo-raas", name: "Rangilo Raas Utsav", venue: "Sarsana Dome Grounds", area: "Sarsana", dates: "3 – 11 Oct", time: "8:00 PM onwards", artist: "Kinjal Dave", tag: "Most booked", from: 599, about: "Surat's biggest open-air garba with live orchestra and a 40,000 sq ft arena.", passes: std(599) },
-  { id: "vesu-garba", name: "Vesu Garba Mahotsav", venue: "VR Mall Grounds", area: "Vesu", dates: "3 – 11 Oct", time: "8:30 PM onwards", artist: "Aishwarya Majmudar", tag: "Premium", from: 799, about: "A premium family-friendly Navratri with curated food court and VIP lounge.", passes: std(799) },
-  { id: "adajan-dandiya", name: "Adajan Dandiya Night", venue: "Riverfront Plot", area: "Adajan", dates: "3 – 11 Oct", time: "8:00 PM onwards", artist: "Geeta Rabari", tag: "Riverside", from: 449, about: "Traditional dandiya by the Tapi river, folk-first and community driven.", passes: std(449) },
-  { id: "piplod-nights", name: "Piplod Navratri Nights", venue: "SVNIT Ground", area: "Piplod", dates: "3 – 11 Oct", time: "9:00 PM onwards", artist: "Osman Mir", tag: "New", from: 399, about: "Youth-favourite garba with modern beats and traditional rounds.", passes: std(399) },
-];
-
-export const getEvent = (id: string) => EVENTS.find((e) => e.id === id);
-export const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
-
+export type Settings = {
+  heroEyebrow: string; heroTitle: string; heroTitleAccent: string; heroText: string; featuredTitle: string;
+  tagline: string; supportLine: string; steps: string[];
+  contactPhone: string; contactEmail: string; contactAddress: string; whatsapp: string; contactText: string;
+  upiId: string; upiName: string; paymentNote: string; footerText: string;
+};
 export type Booking = {
-  id: string; eventId: string; passId: string; qty: number; name: string; phone: string;
-  email: string; date: string; total: number; createdAt: string;
+  id: string; event_id: string; event_name: string; pass_id: string; pass_name: string; qty: number;
+  name: string; phone: string; email: string; night: string; total: number; utr: string;
+  status: "pending" | "approved" | "rejected" | "used"; created_at: string;
 };
-const KEY = "aapnopass.bookings";
-export const loadBookings = (): Booking[] => {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
-};
-export const saveBooking = (b: Booking) => localStorage.setItem(KEY, JSON.stringify([b, ...loadBookings()]));
-export const newId = () => "AP" + Date.now().toString(36).toUpperCase().slice(-6) + Math.floor(Math.random() * 90 + 10);
+
+export const settingsQuery = queryOptions({
+  queryKey: ["settings"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("site_settings").select("data").eq("id", 1).single();
+    if (error) throw error;
+    return data.data as unknown as Settings;
+  },
+});
+
+export const eventsQuery = queryOptions({
+  queryKey: ["events"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("events").select("*").order("sort");
+    if (error) throw error;
+    return data as unknown as EventItem[];
+  },
+});
+
+export const minPrice = (e: EventItem) => Math.min(...e.passes.map((p) => p.price), Infinity);
+export const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
+export const newId = () => "AP" + Date.now().toString(36).toUpperCase().slice(-6) + Math.floor(Math.random() * 900 + 100);
+export const upiLink = (s: Settings, amount: number, note: string) =>
+  `upi://pay?pa=${encodeURIComponent(s.upiId)}&pn=${encodeURIComponent(s.upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+const KEY = "aapnopass.myids";
+export const myIds = (): string[] => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
+export const rememberId = (id: string) => localStorage.setItem(KEY, JSON.stringify([id, ...myIds()]));
+export async function fetchBookings(ids: string[]) {
+  if (!ids.length) return [] as Booking[];
+  const { data, error } = await supabase.rpc("get_bookings", { _ids: ids });
+  if (error) throw error;
+  return (data ?? []) as Booking[];
+}
