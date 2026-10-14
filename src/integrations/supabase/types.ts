@@ -28,8 +28,9 @@ export type Database = {
           phone: string
           qty: number
           status: string
+          stock_applied: boolean
           total: number
-          utr: string
+          utr: string | null
         }
         Insert: {
           created_at?: string
@@ -44,8 +45,9 @@ export type Database = {
           phone: string
           qty: number
           status?: string
+          stock_applied?: boolean
           total: number
-          utr: string
+          utr?: string | null
         }
         Update: {
           created_at?: string
@@ -60,8 +62,9 @@ export type Database = {
           phone?: string
           qty?: number
           status?: string
+          stock_applied?: boolean
           total?: number
-          utr?: string
+          utr?: string | null
         }
         Relationships: []
       }
@@ -157,6 +160,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_utr: { Args: { _id: string; _utr: string }; Returns: undefined }
       get_bookings: {
         Args: { _ids: string[] }
         Returns: {
@@ -172,8 +176,9 @@ export type Database = {
           phone: string
           qty: number
           status: string
+          stock_applied: boolean
           total: number
-          utr: string
+          utr: string | null
         }[]
         SetofOptions: {
           from: "*"

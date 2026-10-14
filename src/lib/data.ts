@@ -14,7 +14,7 @@ export type Settings = {
 };
 export type Booking = {
   id: string; event_id: string; event_name: string; pass_id: string; pass_name: string; qty: number;
-  name: string; phone: string; email: string; night: string; total: number; utr: string;
+  name: string; phone: string; email: string; night: string; total: number; utr: string | null;
   status: "pending" | "approved" | "rejected" | "used"; created_at: string;
 };
 
@@ -39,8 +39,15 @@ export const eventsQuery = queryOptions({
 export const minPrice = (e: EventItem) => Math.min(...e.passes.map((p) => p.price), Infinity);
 export const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
 export const newId = () => "AP" + Date.now().toString(36).toUpperCase().slice(-6) + Math.floor(Math.random() * 900 + 100);
-export const upiLink = (s: Settings, amount: number, note: string) =>
-  `upi://pay?pa=${encodeURIComponent(s.upiId)}&pn=${encodeURIComponent(s.upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+export const upiLink = (s: Settings, amount: number, note: string, ref = "", base = "upi://pay") =>
+  `${base}?pa=${encodeURIComponent(s.upiId)}&pn=${encodeURIComponent(s.upiName)}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(note)}${ref ? `&tr=${ref}` : ""}`;
+export const UPI_APPS = [
+  { name: "Google Pay", base: "tez://upi/pay" },
+  { name: "PhonePe", base: "phonepe://pay" },
+  { name: "Paytm", base: "paytmmp://pay" },
+  { name: "BHIM", base: "upi://pay" },
+  { name: "Other UPI apps", base: "upi://pay" },
+];
 
 const KEY = "aapnopass.myids";
 export const myIds = (): string[] => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
